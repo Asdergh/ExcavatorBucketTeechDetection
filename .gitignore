@@ -1,0 +1,11 @@
+test.*
+*.img
+*.png
+*.jpg
+*.mp3
+*.mp4
+*.pt
+
+weights
+__pycache__.*
+storage.*
