@@ -36,7 +36,7 @@ class TeethsDetectionSet(Dataset):
     #         }
     #     },
     # }
-    
+
     def __init__(self, confs: dict) -> None:
 
         self.params = confs
@@ -99,42 +99,5 @@ class TeethsDetectionSet(Dataset):
         return (img, bbox)
             
 
-
-
-if __name__ == "__main__":
-
-    dataset = TeethsDetectionSet({
-        "source_path": "C:\\Users\\1\\Downloads\\tooth excava.v2i.coco",
-        "split": "train",
-        "transforms": {
-            "resize": {
-                "size": (252, 252),
-                "max_size": None,
-                "antialias": True
-            },
-            "normalize": {
-                "mean": [0.67, 0.67, 0.67],
-                "std": [0.45, 0.45, 0.45]
-            }
-        },
-    })
-    loader = DataLoader(
-        dataset=dataset,
-        batch_size=100,
-        shuffle=True
-    )
-    sample, bboxes = next(iter(loader))
-    bboxes = box_convert(bboxes, in_fmt="xywh", out_fmt="xyxy")
-    print(bboxes)
-    print(bboxes[:, 0].size(), bboxes.size())
-    sample = draw_bounding_boxes(sample[0], bboxes[0].unsqueeze(dim=0), width=5)
-    sample = sample.permute(1, 2, 0).numpy()
-    cv2.imshow("test", sample)
-    cv2.waitKey(0)
-    # for frame in sample:
-
-    #     cv2.imshow("test", frame)
-    #     if cv2.waitKey(1) == ord("q"):
-    #         break
     
         
