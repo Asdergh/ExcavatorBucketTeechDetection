@@ -19,6 +19,24 @@ _transforms_ = {
 
 class TeethsDetectionSet(Dataset):
 
+
+    # class configurations must be passed as json like object in the above structed.
+    # {
+    #     "source_path": path to the COCO format dataset with images and saplementary information,
+    #     "split": traning split, possible: [train, valid, test],
+    #     "transforms": {   : transforms for image augmentation, possible: [resize, normalize]
+    #         "resize": {
+    #             "size": tuple; new size for image,
+    #             "max_size": int; max size to be bounded,
+    #             "antialias": bool; applie antialize to res image
+    #         },
+    #         "normalize": {
+    #             "mean": list | tuple; mean values per each image channel,
+    #             "std": list | tuple; standard deviation values per each channel
+    #         }
+    #     },
+    # }
+    
     def __init__(self, confs: dict) -> None:
 
         self.params = confs
