@@ -16,7 +16,8 @@ from torch.nn import (
     Dropout,
     Upsample,
     Flatten,
-    Softmax
+    Softmax,
+    Dropout2d
 )
 
 
@@ -86,7 +87,8 @@ class ConvBlock(Module):
         padding: int = 0,
         stride: int = 2,
         activation: str = "relu",
-        mode: str = "down"
+        mode: str = "down",
+        dp_rate: float = 0.0,
     ) -> None:
         
         super().__init__()
@@ -105,6 +107,7 @@ class ConvBlock(Module):
         self._net_ = Sequential(
             _conv_[mode],
             BatchNorm2d(num_features=out_channels),
+            Dropout2d(p=dp_rate, inplace=True),
             _activations_[activation]()
         )
     
@@ -207,7 +210,7 @@ class Unet(Module):
             up = layer(up)
             try:
                 up = th.cat([up, down_convs[i]], dim=1)
-            except:
+            except Exception as e:
                 pass
         
         return up
@@ -286,7 +289,25 @@ if __name__ == "__main__":
     test = th.normal(0.12, 1.12, (1, 3, 512, 512))
     testA = th.normal(0.12, 1.12, (100, 32))
 
-    model = DetectionNet({
+    
+    unet = Unet({
+        "depth": 3,
+        "down": {
+            "in_channels": [3, 32, 64],
+            "out_channels": [32, 64, 128],
+            "activation": ["relu", "relu", "relu"],
+            "dp_rate": [0.45, 0.12, 0.0],
+            "mode": ["down", "down", "down"]
+        },
+        "up": {
+            "in_channels": [128, 64*2, 32*2],
+            "out_channels": [64, 32, 3],
+            "activation": ["relu", "relu", "relu"],
+            "dp_rate": [0.45, 0.12, 0.0],
+            "mode": ["up", "up", "up"]
+        }
+    })
+    detection_model = DetectionNet({
         "n_grids": 12,
         "n_classes": 30,
         "detection_head": {
@@ -327,7 +348,9 @@ if __name__ == "__main__":
             }
         }
     })
-    model_out = model(testA)
+    model_out = detection_model(testA)
+    model0_out = unet(test)
+    print(model0_out.size())
     print(model_out[0].size(), model_out[1].size(), model_out[2].size())
 
 
